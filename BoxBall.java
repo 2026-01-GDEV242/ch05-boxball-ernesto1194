@@ -1,108 +1,92 @@
-import java.awt.*;
-import java.awt.geom.*;
+import java.awt.Color;
 
 /**
- * Class BoxBall - a graphical ball that moves similar to the ball in PONG.
- * It bounces around the confines of a box as defined by the Box class.
- * Details of movement are determined by the ball itself. It will move to
- * the right when xspeed is positive and to the left when xspeed is negative.
- * Due to the way computer graphics are drawn using awt, the ball moves
- * DOWN when yspeed is positive and UP when yspeed is negative.
- * 
- * It is the ball's responsibility to determine if it has hit a wall and 
- * to reverse direction
+ * Class BoxBall - a ball that bounces inside a rectangular box on a Canvas.
  *
- * This movement can be initiated by repeated calls to the "move" method.
- * 
- * @author Michael Kölling (mik)
- * @author David J. Barnes
- * @author Bruce Quig
- * @author William Crosbie
- *
- * @version 2025.10.06
+ * @author Ernesto Cuellar
+ * @version 2026.03.27
  */
-
 public class BoxBall
 {
-    private Box myBox;
+    private int x, y;            
+    private int dx, dy;          
+    private int size;            
+    private Color color;         
+    private Canvas canvas;       
 
-    private Ellipse2D.Double circle;    // represents the ball
-    private Color color;        // color of the ball (can be rgb value)
-    private int diameter;       // width of ball in number of pixels
-    private int xPosition;      // horizontal position of bounding square
-    private int yPosition;      // vertical position of bounding square
-    private Canvas canvas;
-    private int ySpeed;         // vertical speed
-    private int xSpeed;         // horizontal speed
+    private int boxX, boxY, boxWidth, boxHeight; 
 
     /**
      * Constructor for objects of class BoxBall
-     *
-     * @param xPos  the horizontal coordinate of the ball
-     * @param yPos  the vertical coordinate of the ball
-     * @param ballDiameter  the diameter (in pixels) of the ball
-     * @param ballColor  the color of the ball
-     * @param box  the bounding box (where the ball will bounce)
-     * @param drawingCanvas  the canvas to draw this ball on
+     * @param canvas the Canvas to draw on
+     * @param boxX the x-coordinate of the top-left corner of the box
+     * @param boxY the y-coordinate of the top-left corner of the box
+     * @param boxWidth the width of the box
+     * @param boxHeight the height of the box
      */
-    public BoxBall(int xPos, int yPos, int ballDiameter, Color ballColor,
-                        Box box, Canvas drawingCanvas)
+    public BoxBall(Canvas canvas, int boxX, int boxY, int boxWidth, int boxHeight)
     {
-        xPosition = xPos;
-        yPosition = yPos;
-        color = ballColor;
-        diameter = ballDiameter;
+        this.canvas = canvas;
+        this.boxX = boxX;
+        this.boxY = boxY;
+        this.boxWidth = boxWidth;
+        this.boxHeight = boxHeight;
 
-        canvas = drawingCanvas;
+        this.size = 20; 
+
+        
+        x = boxX + (int)(Math.random() * (boxWidth - size));
+        y = boxY + (int)(Math.random() * (boxHeight - size));
+
+        
+        do {
+            dx = -7 + (int)(Math.random() * 15); 
+        } while(dx == 0);
+        do {
+            dy = -7 + (int)(Math.random() * 15);
+        } while(dy == 0);
+
+        
+        color = new Color(50 + (int)(Math.random() * 200),
+                          50 + (int)(Math.random() * 200),
+                          50 + (int)(Math.random() * 200));
     }
 
     /**
-     * Draw this ball at its current position onto the canvas.
-     **/
+     * Move the ball, bouncing off the edges of the box.
+     */
+    public void move()
+    {
+        x += dx;
+        y += dy;
+
+        
+        if(x <= boxX) {
+            x = boxX;
+            dx = -dx;
+        }
+        if(x + size >= boxX + boxWidth) {
+            x = boxX + boxWidth - size;
+            dx = -dx;
+        }
+
+        
+        if(y <= boxY) {
+            y = boxY;
+            dy = -dy;
+        }
+        if(y + size >= boxY + boxHeight) {
+            y = boxY + boxHeight - size;
+            dy = -dy;
+        }
+    }
+
+    /**
+     * Draw the ball on the canvas
+     */
     public void draw()
     {
         canvas.setForegroundColor(color);
-        canvas.fillCircle(xPosition, yPosition, diameter);
-    }
-
-    /**
-     * Erase this ball at its current position.
-     **/
-    public void erase()
-    {
-        canvas.eraseCircle(xPosition, yPosition, diameter);
-    }    
-
-    /**
-     * Move this ball according to its position and speed and redraw.
-     **/
-    public void move()
-    {
-        // remove from canvas at the current position
-        erase();
-            
-        // compute new position
-  
-        // figure out if it has hit the left or right wall
-        
-        // figure out if it has hit the top or bottom wall
-        
-        draw();
-    }    
-
-    /**
-     * return the horizontal position of this ball
-     */
-    public int getXPosition()
-    {
-        return xPosition;
-    }
-
-    /**
-     * return the vertical position of this ball
-     */
-    public int getYPosition()
-    {
-        return yPosition;
+        canvas.fillCircle(x, y, size);
     }
 }
